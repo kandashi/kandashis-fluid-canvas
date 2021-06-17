@@ -6,6 +6,6 @@
 
 This module allows you to sync canvas animations between your players. Send earthquakes as a city wall topples, a heartbeat pulse as a player draws close to death or a drunken haze as they stumble from the nearby tavern.
 
-Access this through the FluidCanvas control on the left side bar <i class="fas fa-wind"></i>
+Access this through the FluidCanvas control on the left side bar <img src=https://user-images.githubusercontent.com/1347785/122445505-87c96200-cf99-11eb-9a80-2d84eba53d90.png width="40" height="40">
 
 Shift click to open the User Selection UI and use - or + to increase or decrease the intensity of the effect
