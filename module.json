@@ -32,7 +32,7 @@
     "/scripts/fluidCanvas.js"
   ],
   "socket": true,
-  "url": "This is auto replaced",
-  "manifest": "This is auto replaced",
+  "url": "https://github.com/kandashi/kandashis-fluid-canvas",
+  "manifest": "https://raw.githubusercontent.com/kandashi/kandashis-fluid-canvas/master/module.json",
   "download": "This is auto replaced"
 }
