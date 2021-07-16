@@ -1,0 +1,9 @@
+canvas#board {
+    transition: opacity .25s;
+    -moz-transition: opacity .25s;
+    -webkit-transition: opacity .25s;
+}
+
+canvas#board.fade {
+    opacity: 0;
+}

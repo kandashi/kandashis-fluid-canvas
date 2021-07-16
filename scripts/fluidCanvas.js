@@ -7,11 +7,28 @@ Hooks.once("socketlib.ready", () => {
     KFCSocket.register("drug", FluidCanvas.drug)
     KFCSocket.register("spin", FluidCanvas.spin)
     KFCSocket.register("filters", FluidCanvas.updateFilters)
+    KFCSocket.register("fade", FluidCanvas.fade)
 
 });
 
+Hooks.on("init", () => {
+    CONFIG.Canvas.layers = foundry.utils.mergeObject(CONFIG.Canvas.layers, {
+        fluidCanvas: KFCLayer
+    });
+    if (!Object.is(Canvas.layers, CONFIG.Canvas.layers)) {
+        console.error('Possible incomplete layer injection by other module detected! Trying workaround...')
+
+        const layers = Canvas.layers
+        Object.defineProperty(Canvas, 'layers', {
+            get: function () {
+                return foundry.utils.mergeObject(layers, CONFIG.Canvas.layers)
+            }
+        })
+    }
+})
+
+
 Hooks.on("canvasReady", () => {
-    canvas["fluid"] = new CanvasLayer()
     FluidCanvas.updateFilters()
 })
 
@@ -76,6 +93,16 @@ const FluidEffects = [
         toggle: true
     },
     {
+        name: "fade",
+        title: "Fade",
+        icon: "fas fa-low-vision",
+        onClick: () => {
+            FluidCanvas.keyCheck("fade")
+        },
+        button: true,
+        toggle: true
+    },
+    {
         name: "drugged",
         title: "Drugged",
         icon: "fas fa-syringe",
@@ -94,12 +121,26 @@ Hooks.on('getSceneControlButtons', (controls) => {
         name: "fluidCanvas",
         title: "FluidCanvas",
         icon: "fas fa-wind",
-        layer: "fluid",
-        id: "fluidControls",
+        layer: "fluidCanvas",
         visible: game.user.isGM,
         tools: FluidEffects
     })
 });
+
+class KFCLayer extends CanvasLayer {
+    constructor() {
+        super();
+        this.loader = new PIXI.Loader();
+
+        this.mouseInteractionManager = null;
+
+        this._interactiveChildren = false;
+        this._dragging = false;
+
+        this.options = this.constructor.layerOptions;
+
+    }
+}
 
 class FluidCanvas {
 
@@ -136,13 +177,13 @@ class FluidCanvas {
                     }
                 }
             }
-        }, {left: mouse.clientX + 15, top: mouse.clientY -20}).render(true, )
+        }, { left: mouse.clientX + 15, top: mouse.clientY - 20 }).render(true,)
     }
 
     static earthquake(intensity) {
-        let a = 1*intensity
-        let b = 2*intensity
-        let c = 3*intensity
+        let a = 1 * intensity
+        let b = 2 * intensity
+        let c = 3 * intensity
         document.getElementById("board").animate([
             // keyframes
             { transform: `translate(${a}px, ${a}px) rotate(0deg)` },
@@ -182,38 +223,43 @@ class FluidCanvas {
         });
     }
 
-    static spin() {
+    static spin(intensity) {
         document.getElementById("board").animate([
             // keyframes
             { transform: `rotate(0deg)` },
             { transform: `rotate(360deg)` },
         ], {
             // timing options
-            duration: 200,
+            duration: 400 / intensity,
             iterations: 3
         });
     }
 
     static drug(intensity) {
-        let a = 1*intensity
-        let b = 2*intensity
-        let c = 3*intensity
+        let a = 1 * intensity
+        let b = 2 * intensity
+        let c = 3 * intensity
         const board = document.getElementById("board")
         const currentAnim = board.getAnimations().find(i => i.id === "drugged")
-        if(currentAnim) currentAnim.cancel()
+        if (currentAnim) currentAnim.cancel()
         else {
-        board.animate([
-            // keyframes
-            { filter: `hue-rotate(45deg) blur(${a}px)`,  transform: `rotate(${a}deg)`},
-            { filter: `hue-rotate(-45deg) blur(${a}px)`,  transform: `rotate(-${a}deg)`},
-            { filter: `hue-rotate(45deg) blur(${a}px)`,  transform: `rotate(${a}deg)`},
-        ], {
-            // timing options
-            duration: 10000,
-            iterations: Infinity,
-            id: "drugged"
-        });
+            board.animate([
+                // keyframes
+                { filter: `hue-rotate(45deg) blur(${a}px)`, transform: `rotate(${a}deg)` },
+                { filter: `hue-rotate(-45deg) blur(${a}px)`, transform: `rotate(-${a}deg)` },
+                { filter: `hue-rotate(45deg) blur(${a}px)`, transform: `rotate(${a}deg)` },
+            ], {
+                // timing options
+                duration: 10000,
+                iterations: Infinity,
+                id: "drugged"
+            });
+        }
     }
+
+    static fade() {
+        const board = document.getElementById("board")
+        board.classList.toggle("fade")
     }
 
     static async sepia() {
@@ -222,7 +268,7 @@ class FluidCanvas {
         KFCSocket.executeForEveryone("filters")
     }
     static async blur(intensity) {
-        let b = 2*intensity
+        let b = 2 * intensity
         let toggle = canvas.scene.getFlag(KFC, "blur")?.active
         await canvas.scene.setFlag(KFC, "blur", { active: !toggle, value: `blur(${b}px)` })
         KFCSocket.executeForEveryone("filters")
@@ -233,7 +279,13 @@ class FluidCanvas {
         await canvas.scene.setFlag(KFC, "negative", { active: !toggle, value: "invert(100%)" })
         KFCSocket.executeForEveryone("filters")
     }
-    
+
+    static async black() {
+        let toggle = canvas.scene.getFlag(KFC, "black")?.active
+        await canvas.scene.setFlag(KFC, "black", { active: !toggle, value: "brightness(0)" })
+        KFCSocket.executeForEveryone("filters")
+    }
+
 
     static customFilter(frames, duration, iterations) {
         document.getElementById("board").animate(frames, {
@@ -247,7 +299,7 @@ class FluidCanvas {
         let filters = canvas.scene.data.flags[KFC]
         let filter
         if (filters) {
-            filter = Object.values(filters).reduce((a, {active, value}) =>  {if(active) return a += value; else return a}, "")
+            filter = Object.values(filters).reduce((a, { active, value }) => { if (active) return a += value; else return a }, "")
         }
         else filter = ""
         document.getElementById("board").style.filter = filter

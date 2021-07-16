@@ -7,6 +7,7 @@
   "manifestPlusVersion": "1.0.0",
   "minimumCoreVersion": "0.8.5",
   "compatibleCoreVersion": "0.8.6",
+  "styles": ["/styles/kfcss.css"],
   "authors": [
     {
       "name": "Kandashi",
@@ -21,7 +22,7 @@
       }
   ],
   "esmodules": [
-    "/scripts/module.js"
+    "/scripts/fluidCanvas.js"
   ],
   "socket": true,
   "url": "This is auto replaced",
