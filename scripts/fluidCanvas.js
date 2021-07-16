@@ -32,91 +32,90 @@ Hooks.on("canvasReady", () => {
     FluidCanvas.updateFilters()
 })
 
-const FluidEffects = [
-    {
-        name: "earthquake",
-        title: "Earthquake",
-        icon: "fas fa-mountain",
-        onClick: () => {
-            FluidCanvas.keyCheck("earthquake")
-        },
-        button: true
-    },
-    {
-        name: "heartbeat",
-        title: "Heart Beat",
-        icon: "fas fa-heartbeat",
-        onClick: () => {
-            FluidCanvas.keyCheck("heartbeat")
-        },
-        button: true
-    },
-    {
-        name: "spin",
-        title: "Spin",
-        icon: "fas fa-undo",
-        onClick: () => {
-            FluidCanvas.keyCheck("spin")
-        },
-        button: true
-    },
-    {
-        name: "sepia",
-        title: "Sepia",
-        icon: "fas fa-film",
-        onClick: () => {
-            FluidCanvas.sepia()
-        },
-        button: true,
-        toggle: true
-    },
-    {
-        name: "negative",
-        title: "Negative",
-        icon: "fas fa-photo-video",
-        onClick: () => {
-            FluidCanvas.negative()
-        },
-        button: true,
-        toggle: true
-    },
-    {
-        name: "blur",
-        title: "Blur",
-        icon: "fas fa-braille",
-        onClick: () => {
-            const k = game.keyboard
-            let intensity = k._downKeys.has("=") ? 2 : k._downKeys.has("-") ? 0.5 : 1
-            FluidCanvas.blur(intensity)
-        },
-        button: true,
-        toggle: true
-    },
-    {
-        name: "fade",
-        title: "Fade",
-        icon: "fas fa-low-vision",
-        onClick: () => {
-            FluidCanvas.keyCheck("fade")
-        },
-        button: true,
-        toggle: true
-    },
-    {
-        name: "drugged",
-        title: "Drugged",
-        icon: "fas fa-syringe",
-        onClick: () => {
-            FluidCanvas.keyCheck("drug")
-        },
-        button: true,
-        toggle: true
-    },
-
-
-]
-
 Hooks.on('getSceneControlButtons', (controls) => {
+    const FluidEffects = [
+        {
+            name: "earthquake",
+            title: game.i18n.localize("KFC.earthquake"),
+            icon: "fas fa-mountain",
+            onClick: () => {
+                FluidCanvas.keyCheck("earthquake")
+            },
+            button: true
+        },
+        {
+            name: "heartbeat",
+            title: game.i18n.localize("KFC.HeartBeat"),
+            icon: "fas fa-heartbeat",
+            onClick: () => {
+                FluidCanvas.keyCheck("heartbeat")
+            },
+            button: true
+        },
+        {
+            name: "spin",
+            title: game.i18n.localize("KFC.Spin"),
+            icon: "fas fa-undo",
+            onClick: () => {
+                FluidCanvas.keyCheck("spin")
+            },
+            button: true
+        },
+        {
+            name: "sepia",
+            title: game.i18n.localize("KFC.Sepia"),
+            icon: "fas fa-film",
+            onClick: () => {
+                FluidCanvas.sepia()
+            },
+            button: true,
+            toggle: true
+        },
+        {
+            name: "negative",
+            title: game.i18n.localize("KFC.Negative"),
+            icon: "fas fa-photo-video",
+            onClick: () => {
+                FluidCanvas.negative()
+            },
+            button: true,
+            toggle: true
+        },
+        {
+            name: "blur",
+            title: game.i18n.localize("KFC.Blur"),
+            icon: "fas fa-braille",
+            onClick: () => {
+                const k = game.keyboard
+                let intensity = k._downKeys.has("=") ? 2 : k._downKeys.has("-") ? 0.5 : 1
+                FluidCanvas.blur(intensity)
+            },
+            button: true,
+            toggle: true
+        },
+        {
+            name: "fade",
+            title: game.i18n.localize("KFC.Fade"),
+            icon: "fas fa-low-vision",
+            onClick: () => {
+                FluidCanvas.keyCheck("fade")
+            },
+            button: true,
+            toggle: true
+        },
+        {
+            name: "drugged",
+            title: game.i18n.localize("KFC.Drugged"),
+            icon: "fas fa-syringe",
+            onClick: () => {
+                FluidCanvas.keyCheck("drug")
+            },
+            button: true,
+            toggle: true
+        },
+    
+    
+    ]
     controls.push({
         name: "fluidCanvas",
         title: "FluidCanvas",
@@ -163,11 +162,11 @@ class FluidCanvas {
             </div>
         </form>`
         new Dialog({
-            title: "Player Choice",
+            title: game.i18n.localize("KFC.PlayerChoice"),
             content: contents,
             buttons: {
                 one: {
-                    label: "Launch",
+                    label: game.i18n.localize("KFC.Launch"),
                     icon: `<i class="fas fa-wind"></i>`,
                     callback: (html) => {
                         var users = $('input[type="checkbox"]:checked').map(function () {

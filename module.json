@@ -15,6 +15,13 @@
       "discord": "Kandashi (He/Him)#6698"
     }
   ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json"
+    }
+  ],
   "dependencies": [
     {
       "name": "socketlib",

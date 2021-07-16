@@ -1,3 +1,12 @@
 {
-    "MODULE.hello": "hello"
+    "KFC.earthquake": "Earthquake",
+    "KFC.HeartBeat": "Heart Beat",
+    "KFC.Spin": "Spin",
+    "KFC.Sepia": "Sepia",
+    "KFC.Negative": "Negative",
+    "KFC.Blur": "Blur",
+    "KFC.Fade": "Fade",
+    "KFC.Drugged": "Drugged",
+    "KFC.PlayerChoice": "Player Choice",
+    "KFC.Launch": "Launch"
 }
