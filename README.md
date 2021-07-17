@@ -9,5 +9,5 @@ This module allows you to sync canvas animations between your players. Send eart
 Access this through the FluidCanvas control on the left side bar <img src=https://user-images.githubusercontent.com/1347785/122445505-87c96200-cf99-11eb-9a80-2d84eba53d90.png width="40" height="40">
 
 ## Hotkeys (additive)
-- Shift - opens the User Selection UI 
-- -/+  increase/ decrease the intensity of the animation
+ - Shift - opens the User Selection UI 
+ - -/+  increase/ decrease the intensity of the animation (this only works with some of the features, excluding Fade, Sepia and Negative)
