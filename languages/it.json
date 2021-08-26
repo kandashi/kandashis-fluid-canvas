@@ -1,12 +1,12 @@
 {
   "KFC.earthquake": "Terremoto",
-  "KFC.HeartBeat": "Battito del cuore",
-  "KFC.Spin": "Spin",
-  "KFC.Sepia": "Seppia",
-  "KFC.Negative": "negativo",
-  "KFC.Blur": "Sfocatura",
-  "KFC.Fade": "Dissolvenza",
-  "KFC.Drugged": "Drogato",
+  "KFC.heartBeat": "Battito del cuore",
+  "KFC.spin": "Spin",
+  "KFC.sepia": "Seppia",
+  "KFC.negative": "negativo",
+  "KFC.blur": "Sfocatura",
+  "KFC.fade": "Dissolvenza",
+  "KFC.drug": "Drogato",
   "KFC.PlayerChoice": "Scelta del giocatore",
   "KFC.Launch": "Lancio"
 }

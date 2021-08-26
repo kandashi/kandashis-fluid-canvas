@@ -1,12 +1,12 @@
 {
     "KFC.earthquake": "Earthquake",
-    "KFC.HeartBeat": "Heart Beat",
-    "KFC.Spin": "Spin",
-    "KFC.Sepia": "Sepia",
-    "KFC.Negative": "Negative",
-    "KFC.Blur": "Blur",
-    "KFC.Fade": "Fade",
-    "KFC.Drugged": "Drugged",
+    "KFC.heartBeat": "Heart Beat",
+    "KFC.spin": "Spin",
+    "KFC.sepia": "Sepia",
+    "KFC.negative": "Negative",
+    "KFC.blur": "Blur",
+    "KFC.fade": "Fade",
+    "KFC.drug": "Drugged",
     "KFC.PlayerChoice": "Player Choice",
     "KFC.Launch": "Launch"
 }

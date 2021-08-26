@@ -1,12 +1,12 @@
 {
   "KFC.earthquake": "地震",
-  "KFC.HeartBeat": "ハートビート",
-  "KFC.Spin": "スピン",
-  "KFC.Sepia": "セピア",
-  "KFC.Negative": "ネガティブ",
-  "KFC.Blur": "ぼかし",
-  "KFC.Fade": "フェード",
-  "KFC.Drugged": "薬漬け",
+  "KFC.heartBeat": "ハートビート",
+  "KFC.spin": "スピン",
+  "KFC.sepia": "セピア",
+  "KFC.negative": "ネガティブ",
+  "KFC.blur": "ぼかし",
+  "KFC.fade": "フェード",
+  "KFC.drug": "薬漬け",
   "KFC.PlayerChoice": "プレーヤーの選択",
   "KFC.Launch": "起動する"
 }

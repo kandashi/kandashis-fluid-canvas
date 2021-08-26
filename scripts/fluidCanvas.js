@@ -8,6 +8,10 @@ Hooks.once("socketlib.ready", () => {
     KFCSocket.register("spin", FluidCanvas.spin)
     KFCSocket.register("filters", FluidCanvas.updateFilters)
     KFCSocket.register("fade", FluidCanvas.fade)
+    KFCSocket.register("sepia", FluidCanvas.sepia)
+    KFCSocket.register("drug", FluidCanvas.drug)
+    KFCSocket.register("negative", FluidCanvas.negative)
+    KFCSocket.register("blur", FluidCanvas.blur)
 
 });
 
@@ -32,7 +36,8 @@ Hooks.on("canvasReady", () => {
     FluidCanvas.updateFilters()
 })
 
-Hooks.on('getSceneControlButtons', (controls) => {
+Hooks.on('getSceneControlButtons', (controls, a, b) => {
+    if (!canvas.scene) return;
     const FluidEffects = [
         {
             name: "earthquake",
@@ -45,7 +50,7 @@ Hooks.on('getSceneControlButtons', (controls) => {
         },
         {
             name: "heartbeat",
-            title: game.i18n.localize("KFC.HeartBeat"),
+            title: game.i18n.localize("KFC.heartBeat"),
             icon: "fas fa-heartbeat",
             onClick: () => {
                 FluidCanvas.keyCheck("heartbeat")
@@ -54,7 +59,7 @@ Hooks.on('getSceneControlButtons', (controls) => {
         },
         {
             name: "spin",
-            title: game.i18n.localize("KFC.Spin"),
+            title: game.i18n.localize("KFC.spin"),
             icon: "fas fa-undo",
             onClick: () => {
                 FluidCanvas.keyCheck("spin")
@@ -63,58 +68,63 @@ Hooks.on('getSceneControlButtons', (controls) => {
         },
         {
             name: "sepia",
-            title: game.i18n.localize("KFC.Sepia"),
+            title: game.i18n.localize("KFC.sepia"),
             icon: "fas fa-film",
             onClick: () => {
-                FluidCanvas.sepia()
+                FluidCanvas.keyCheck("sepia", true)
             },
             button: true,
-            toggle: true
+            toggle: true,
+            active: canvas.scene.getFlag(KFC, "sepia")?.active
+
         },
         {
             name: "negative",
-            title: game.i18n.localize("KFC.Negative"),
+            title: game.i18n.localize("KFC.negative"),
             icon: "fas fa-photo-video",
             onClick: () => {
-                FluidCanvas.negative()
+                FluidCanvas.keyCheck("negative", true)
             },
             button: true,
-            toggle: true
+            toggle: true,
+            active: canvas.scene.getFlag(KFC, "negative")?.active
         },
         {
             name: "blur",
-            title: game.i18n.localize("KFC.Blur"),
+            title: game.i18n.localize("KFC.blur"),
             icon: "fas fa-braille",
             onClick: () => {
-                const k = game.keyboard
-                let intensity = k._downKeys.has("=") ? 2 : k._downKeys.has("-") ? 0.5 : 1
-                FluidCanvas.blur(intensity)
+                FluidCanvas.keyCheck("blur", true)
             },
             button: true,
-            toggle: true
+            toggle: true,
+            active: canvas.scene.getFlag(KFC, "blur")?.active
+
         },
         {
             name: "fade",
-            title: game.i18n.localize("KFC.Fade"),
+            title: game.i18n.localize("KFC.fade"),
             icon: "fas fa-low-vision",
             onClick: () => {
-                FluidCanvas.keyCheck("fade")
+                FluidCanvas.keyCheck("fade", true)
             },
             button: true,
-            toggle: true
+            toggle: true,
+            active: canvas.scene.getFlag(KFC, "fade")?.active
+
         },
         {
             name: "drugged",
-            title: game.i18n.localize("KFC.Drugged"),
+            title: game.i18n.localize("KFC.drug"),
             icon: "fas fa-syringe",
             onClick: () => {
-                FluidCanvas.keyCheck("drug")
+                FluidCanvas.keyCheck("drug", true)
             },
             button: true,
-            toggle: true
+            toggle: true,
+            active: canvas.scene.getFlag(KFC, "drug")?.active
+
         },
-    
-    
     ]
     controls.push({
         name: "fluidCanvas",
@@ -143,43 +153,60 @@ class KFCLayer extends CanvasLayer {
 
 class FluidCanvas {
 
-    static keyCheck(type) {
+    static keyCheck(type, toggle) {
+        let inc = ["=", "+", "Alt"]
+        let dec = ["-", "_", "Control"]
         this.type = type
+        this.toggle = toggle
         const k = game.keyboard
         const dialog = k._downKeys.has("Shift") ? true : false
-        this.intensity = k._downKeys.has("=") || k._downKeys.has("+") ? 2 : k._downKeys.has("-") || k._downKeys.has("_") ? 0.5 : 1
+        const dK = Array.from(k._downKeys)
+        this.intensity = inc.some(i => dK.includes(i)) ? 2 : dec.some(i => dK.includes(i)) ? 0.5 : 1
         if (dialog) {
             this.fluidDialog()
         }
-        else (KFCSocket.executeForEveryone(this.type, this.intensity))
+        else if (!toggle) (KFCSocket.executeForEveryone(this.type, this.intensity))
+
     }
     static fluidDialog() {
         let mouse = canvas.app.renderer.plugins.interaction.mouse.originalEvent;
-        let playerList = game.users.contents.reduce((a, v) => { if (v.active) { return a += `<div><input type="checkbox" id="name" checked value="${v.id}">${v.name}</input></div>` } else return a }, "")
+        let current = canvas.scene.getFlag(KFC, this.type)
+        let playerList = game?.users?.contents.reduce((a, v) => {
+            let effActive = current?.users?.includes(v.id) && current.active
+            if (v.active) {
+                return a += `<div><input type="checkbox" id="name" checked value="${v.id}">${v.name}${effActive ? "(Active)" : ""}</input></div>`
+            } else return a
+        }
+            , "")
         let contents = `<form> 
             <div class="flexcol"> 
                 ${playerList}
             </div>
         </form>`
         new Dialog({
-            title: game.i18n.localize("KFC.PlayerChoice"),
+            title: `${game.i18n.localize("KFC.PlayerChoice")}, ${game.i18n.localize(`KFC.${this.type}`)}`,
             content: contents,
             buttons: {
                 one: {
-                    label: game.i18n.localize("KFC.Launch"),
+                    label: `${game.i18n.localize("KFC.Launch")}`,
                     icon: `<i class="fas fa-wind"></i>`,
                     callback: (html) => {
                         var users = $('input[type="checkbox"]:checked').map(function () {
                             return $(this).val();
                         }).get()
-                        KFCSocket.executeForUsers(this.type, users, this.intensity)
+                        if (this.toggle) {
+                            KFCSocket.executeAsGM(this.type, users, this.intensity)
+                        }
+                        else {
+                            KFCSocket.executeForUsers(this.type, users, this.intensity)
+                        }
                     }
                 }
             }
         }, { left: mouse.clientX + 15, top: mouse.clientY - 20 }).render(true,)
     }
 
-    static earthquake(intensity) {
+    static earthquake(intensity, duration = 500, iteration = 3) {
         let a = 1 * intensity
         let b = 2 * intensity
         let c = 3 * intensity
@@ -194,17 +221,17 @@ class FluidCanvas {
             { transform: `translate(-${c}px, ${a}px) rotate(0deg)` },
             { transform: `translate(${c}px, ${a}px) rotate(-${a}deg)` },
             { transform: `translate(-${a}px, -${a}px) rotate(${a}deg)` },
-            { transform: `translate(${a}px, ${b}px) rotate(0de)` },
+            { transform: `translate(${a}px, ${b}px) rotate(0deg)` },
             { transform: `translate(${a}px, -${b}px) rotate(-${a}deg)` }
 
         ], {
             // timing options
-            duration: 500,
-            iterations: 3
+            duration: duration,
+            iterations: iteration
         });
     }
 
-    static heartBeat(intensity) {
+    static heartBeat(intensity, duration = 1500, iteration = 3) {
         let a = intensity > 1 ? 1.2 : intensity < 1 ? 1.05 : 1.1
         let b = intensity > 1 ? 1.1 : intensity < 1 ? 1.025 : 1.05
         document.getElementById("board").animate([
@@ -216,32 +243,34 @@ class FluidCanvas {
             { transform: `scale(1)` },
         ], {
             // timing options
-            duration: 1500,
-            iterations: 3,
+            duration: duration,
+            iterations: iteration,
             ease: "ease",
         });
     }
 
-    static spin(intensity) {
+    static spin(intensity, duration = 400, iteration = 3) {
         document.getElementById("board").animate([
             // keyframes
             { transform: `rotate(0deg)` },
             { transform: `rotate(360deg)` },
         ], {
             // timing options
-            duration: 400 / intensity,
-            iterations: 3
+            duration: duration / intensity,
+            iterations: iteration
         });
     }
 
-    static drug(intensity) {
+    static async drugged(userID, active, intensity, duration = 10000, iteration = Infinity, ) {
         let a = 1 * intensity
         let b = 2 * intensity
         let c = 3 * intensity
         const board = document.getElementById("board")
         const currentAnim = board.getAnimations().find(i => i.id === "drugged")
-        if (currentAnim) currentAnim.cancel()
-        else {
+        if (currentAnim && (!active || !userID.includes(game.user.id))) {
+            currentAnim.cancel()
+        }
+        else if (userID.includes(game.user.id) && active) {
             board.animate([
                 // keyframes
                 { filter: `hue-rotate(45deg) blur(${a}px)`, transform: `rotate(${a}deg)` },
@@ -249,8 +278,8 @@ class FluidCanvas {
                 { filter: `hue-rotate(45deg) blur(${a}px)`, transform: `rotate(${a}deg)` },
             ], {
                 // timing options
-                duration: 10000,
-                iterations: Infinity,
+                duration: duration,
+                iterations: iteration,
                 id: "drugged"
             });
         }
@@ -261,27 +290,33 @@ class FluidCanvas {
         board.classList.toggle("fade")
     }
 
-    static async sepia() {
-        let toggle = canvas.scene.getFlag(KFC, "sepia")?.active
-        await canvas.scene.setFlag(KFC, "sepia", { active: !toggle, value: "sepia(1)" })
+    static async drug(userID, intensity, duration = 10000, iteration = Infinity){
+        let toggle = canvas.scene.getFlag(KFC, "drug")?.active
+        await canvas.scene.setFlag(KFC, "drug", { active: !toggle, intensity: intensity, duration: duration, iteration: iteration, users: userID })
         KFCSocket.executeForEveryone("filters")
     }
-    static async blur(intensity) {
+
+    static async sepia(userID) {
+        let toggle = canvas.scene.getFlag(KFC, "sepia")?.active
+        await canvas.scene.setFlag(KFC, "sepia", { active: !toggle, value: "sepia(1)", users: userID })
+        KFCSocket.executeForEveryone("filters")
+    }
+    static async blur(userID, intensity,) {
         let b = 2 * intensity
         let toggle = canvas.scene.getFlag(KFC, "blur")?.active
-        await canvas.scene.setFlag(KFC, "blur", { active: !toggle, value: `blur(${b}px)` })
+        await canvas.scene.setFlag(KFC, "blur", { active: !toggle, value: `blur(${b}px)`, users: userID })
         KFCSocket.executeForEveryone("filters")
     }
 
-    static async negative() {
+    static async negative(userID) {
         let toggle = canvas.scene.getFlag(KFC, "negative")?.active
-        await canvas.scene.setFlag(KFC, "negative", { active: !toggle, value: "invert(100%)" })
+        await canvas.scene.setFlag(KFC, "negative", { active: !toggle, value: "invert(100%)", users: userID })
         KFCSocket.executeForEveryone("filters")
     }
 
-    static async black() {
+    static async black(userID) {
         let toggle = canvas.scene.getFlag(KFC, "black")?.active
-        await canvas.scene.setFlag(KFC, "black", { active: !toggle, value: "brightness(0)" })
+        await canvas.scene.setFlag(KFC, "black", { active: !toggle, value: "brightness(0)", users: userID })
         KFCSocket.executeForEveryone("filters")
     }
 
@@ -296,12 +331,21 @@ class FluidCanvas {
 
     static updateFilters() {
         let filters = canvas.scene.data.flags[KFC]
+        let drug = filters?.drug
         let filter
         if (filters) {
-            filter = Object.values(filters).reduce((a, { active, value }) => { if (active) return a += value; else return a }, "")
+            filter = Object.values(filters).reduce((a, { active, value, users }) => { if (active && !!value && users.includes(game.user.id)) return a += value; else return a }, "")
         }
-        else filter = ""
+        else {
+            filter = ""
+        }
         document.getElementById("board").style.filter = filter
+        if (drug) {
+            drug.iteration = drug.iteration || "Infinity"
+            FluidCanvas.drugged(drug.users, drug.active, drug.intensity, drug.duration, drug.iteration, false)
+        }
     }
 
 }
+
+window.FluidCanvas = FluidCanvas

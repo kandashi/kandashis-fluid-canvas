@@ -1,12 +1,12 @@
 {
   "KFC.earthquake": "地震",
-  "KFC.HeartBeat": "心跳",
-  "KFC.Spin": "旋转",
-  "KFC.Sepia": "棕褐色",
-  "KFC.Negative": "负",
-  "KFC.Blur": "模糊",
-  "KFC.Fade": "淡出",
-  "KFC.Drugged": "药物",
+  "KFC.heartBeat": "心跳",
+  "KFC.spin": "旋转",
+  "KFC.sepia": "棕褐色",
+  "KFC.negative": "负",
+  "KFC.blur": "模糊",
+  "KFC.fade": "淡出",
+  "KFC.drug": "药物",
   "KFC.PlayerChoice": "玩家选择",
   "KFC.Launch": "启动"
 }
