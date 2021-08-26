@@ -10,4 +10,4 @@ Access this through the FluidCanvas control on the left side bar <img src=https:
 
 ## Hotkeys (additive)
  - Shift - opens the User Selection UI 
- - -/+  increase/ decrease the intensity of the animation (this only works with some of the features, excluding Fade, Sepia and Negative)
+ - `- or Ctrl` to decrease and `+ or Alt` to increase the intensity of the animation (this only works with some of the features, excluding Fade, Sepia and Negative)
