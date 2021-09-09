@@ -165,6 +165,10 @@ class FluidCanvas {
         if (dialog) {
             this.fluidDialog()
         }
+        else if(toggle) {
+            let users = game.users.map(i => i.id)
+            KFCSocket.executeAsGM(this.type, users, this.intensity)
+        }
         else if (!toggle) (KFCSocket.executeForEveryone(this.type, this.intensity))
 
     }
