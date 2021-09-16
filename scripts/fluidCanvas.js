@@ -12,7 +12,7 @@ Hooks.once("socketlib.ready", () => {
     KFCSocket.register("drug", FluidCanvas.drug)
     KFCSocket.register("negative", FluidCanvas.negative)
     KFCSocket.register("blur", FluidCanvas.blur)
-
+    window.KFC = KFCSocket
 });
 
 Hooks.on("init", () => {
@@ -164,7 +164,7 @@ class FluidCanvas {
         this.intensity = inc.some(i => dK.includes(i)) ? 2 : dec.some(i => dK.includes(i)) ? 0.5 : 1
         if (dialog) {
             this.fluidDialog()
-        }
+        }   
         else if(toggle) {
             let users = game.users.map(i => i.id)
             KFCSocket.executeAsGM(this.type, users, this.intensity)
