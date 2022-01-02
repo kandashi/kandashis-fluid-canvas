@@ -15,21 +15,7 @@ Hooks.once("socketlib.ready", () => {
     window.KFC = KFCSocket
 });
 
-Hooks.on("init", () => {
-    CONFIG.Canvas.layers = foundry.utils.mergeObject(CONFIG.Canvas.layers, {
-        fluidCanvas: KFCLayer
-    });
-    if (!Object.is(Canvas.layers, CONFIG.Canvas.layers)) {
-        console.error('Possible incomplete layer injection by other module detected! Trying workaround...')
 
-        const layers = Canvas.layers
-        Object.defineProperty(Canvas, 'layers', {
-            get: function () {
-                return foundry.utils.mergeObject(layers, CONFIG.Canvas.layers)
-            }
-        })
-    }
-})
 
 
 Hooks.on("canvasReady", () => {
@@ -154,13 +140,13 @@ class KFCLayer extends CanvasLayer {
 class FluidCanvas {
 
     static keyCheck(type, toggle) {
-        let inc = ["=", "+", "Alt"]
-        let dec = ["-", "_", "Control"]
+        let inc = ["Equal", "AltLeft"]
+        let dec = ["Minus", "ControlLeft"]
         this.type = type
         this.toggle = toggle
         const k = game.keyboard
-        const dialog = k._downKeys.has("Shift") ? true : false
-        const dK = Array.from(k._downKeys)
+        const dialog = k.downKeys.has("Shift") ? true : false
+        const dK = Array.from(k.downKeys)
         this.intensity = inc.some(i => dK.includes(i)) ? 2 : dec.some(i => dK.includes(i)) ? 0.5 : 1
         if (dialog) {
             this.fluidDialog()
@@ -351,5 +337,18 @@ class FluidCanvas {
     }
 
 }
+Hooks.on("init", () => {
+    CONFIG.Canvas.layers["fluidCanvas"] = {group: "effects", layerClass: KFCLayer}
+    
+    if (!Object.is(Canvas.layers, CONFIG.Canvas.layers)) {
+        console.error('Possible incomplete layer injection by other module detected! Trying workaround...')
 
+        const layers = Canvas.layers
+        Object.defineProperty(Canvas, 'layers', {
+            get: function () {
+                return foundry.utils.mergeObject(layers, CONFIG.Canvas.layers)
+            }
+        })
+    }
+})
 window.FluidCanvas = FluidCanvas
