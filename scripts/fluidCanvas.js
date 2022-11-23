@@ -164,9 +164,10 @@ class FluidCanvas {
         this.type = type
         this.toggle = toggle
         const k = game.keyboard
-        const dialog = k.downKeys.has("Shift")
+        const dialog = game.release.generation >= 10 ? k.downKeys.has("ShiftLeft") : k.downKeys.has("Shift")
         const dK = Array.from(k.downKeys)
         this.intensity = inc.some(i => dK.includes(i)) ? 2 : dec.some(i => dK.includes(i)) ? 0.5 : 1
+        console.log(dialog)
         if (dialog) {
             this.fluidDialog()
         }   
