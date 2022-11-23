@@ -122,6 +122,25 @@ Hooks.on('getSceneControlButtons', (controls, a, b) => {
     })
 });
 
+
+class KFCLayerv10 extends InteractionLayer {
+    constructor() {
+        super();
+        this.loader = new PIXI.Loader();
+
+        this.mouseInteractionManager = null;
+
+        this._interactiveChildren = false;
+        this._dragging = false;
+
+        this.options = this.constructor.layerOptions;
+
+    }
+
+    async _draw(options) {
+    }
+}
+
 class KFCLayer extends CanvasLayer {
     constructor() {
         super();
@@ -145,9 +164,10 @@ class FluidCanvas {
         this.type = type
         this.toggle = toggle
         const k = game.keyboard
-        const dialog = k.downKeys.has("Shift") ? true : false
+        const dialog = game.release.generation >= 10 ? k.downKeys.has("ShiftLeft") : k.downKeys.has("Shift")
         const dK = Array.from(k.downKeys)
         this.intensity = inc.some(i => dK.includes(i)) ? 2 : dec.some(i => dK.includes(i)) ? 0.5 : 1
+        console.log(dialog)
         if (dialog) {
             this.fluidDialog()
         }   
@@ -181,7 +201,7 @@ class FluidCanvas {
                     label: `${game.i18n.localize("KFC.Launch")}`,
                     icon: `<i class="fas fa-wind"></i>`,
                     callback: (html) => {
-                        var users = $('input[type="checkbox"]:checked').map(function () {
+                        let users = $('input[type="checkbox"]:checked').map(function () {
                             return $(this).val();
                         }).get()
                         if (this.toggle) {
@@ -338,8 +358,8 @@ class FluidCanvas {
 
 }
 Hooks.on("init", () => {
-    CONFIG.Canvas.layers["fluidCanvas"] = {group: "effects", layerClass: KFCLayer}
-    
+    CONFIG.Canvas.layers["fluidCanvas"] = {group: `${game.release.generation >= 10 ? 'interface' : 'effects'}`, layerClass: (game.release.generation >= 10 ? KFCLayerv10 : KFCLayer)}
+
     if (!Object.is(Canvas.layers, CONFIG.Canvas.layers)) {
         console.error('Possible incomplete layer injection by other module detected! Trying workaround...')
 
